@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Big Is a Tiny House?</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #4ade80;
+    --orange: #fb923c;
+    --pink: #f472b6;
+    --yellow: #facc15;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+  }
+  header h1 {
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    color: var(--muted);
+    margin-top: .5rem;
+    font-size: clamp(.9rem, 2.5vw, 1.1rem);
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1.5rem 1rem .5rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .tab-btn {
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    color: var(--muted);
+    padding: .5rem 1rem;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); border-color: var(--accent); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* ── Visual comparison area ── */
+  .stage {
+    position: relative;
+    width: 90%;
+    max-width: 700px;
+    margin: 1.5rem auto;
+    aspect-ratio: 16 / 10;
+    background: #131c2e;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid #2a3650;
+  }
+  .stage .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Boxes representing spaces */
+  .space-box {
+    position: absolute;
+    border-radius: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: clamp(.6rem, 1.8vw, .9rem);
+    text-align: center;
+    transition: all .6s cubic-bezier(.22,1,.36,1);
+    opacity: 0;
+    transform: scale(.7);
+    line-height: 1.2;
+  }
+  .space-box.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .space-box .label {
+    pointer-events: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,.6);
+  }
+
+  /* ── Info cards ── */
+  .info {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: .75rem;
+  }
+  .info-card {
+    background: var(--card-bg);
+    border-radius: .75rem;
+    padding: 1rem;
+    text-align: center;
+    transition: transform .3s, box-shadow .3s;
+  }
+  .info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+  .info-card .icon { font-size: 1.6rem; }
+  .info-card .val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: .25rem 0;
+  }
+  .info-card .desc {
+    font-size: .75rem;
+    color: var(--muted);
+  }
+
+  /* ── Stats bar ── */
+  .bar-section {
+    max-width: 700px;
+    margin: 1rem auto 0;
+    padding: 0 1rem 2rem;
+  }
+  .bar-section h2 {
+    font-size: 1rem;
+    margin-bottom: .75rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: .6rem;
+    gap: .5rem;
+  }
+  .bar-label {
+    width: 110px;
+    font-size: .78rem;
+    text-align: right;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+  .bar-track {
+    flex: 1;
+    height: 22px;
+    background: #1a2540;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: .5rem;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--bg);
+    width: 0%;
+    transition: width 1s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ── Fun fact ── */
+  .fun-fact {
+    text-align: center;
+    padding: .5rem 1rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: .92rem;
+    color: var(--yellow);
+    min-height: 3.5rem;
+    transition: opacity .3s;
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: .7rem;
+    color: #475569;
+  }
+
+  /* Animations */
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(56,189,248,.4); }
+    50% { box-shadow: 0 0 0 8px rgba(56,189,248,0); }
+  }
+  .pulse { animation: pulse 2s infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>How Big Is a Tiny House?</h1>
+  <p>Tap a space below to see how it stacks up</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="stage" id="stage">
+  <div class="grid-bg"></div>
+</div>
+
+<div class="fun-fact" id="funFact"></div>
+
+<div class="info" id="infoCards"></div>
+
+<div class="bar-section">
+  <h2>Square Footage Comparison</h2>
+  <div id="bars"></div>
+</div>
+
+<footer>Built for fun &mdash; data is approximate</footer>
+
+<script>
+(function () {
+  /* ── Data ── */
+  const spaces = [
+    {
+      id: 'tiny',
+      name: 'Tiny House',
+      sqft: 225,
+      icon: '\u{1F3E0}',
+      color: 'var(--accent)',
+      colorRgb: '56,189,248',
+      facts: [
+        'The average tiny house is about 225 sq ft \u2014 smaller than most hotel rooms!',
+        'Tiny houses typically cost $30k\u2013$60k to build from scratch.',
+        'Over 60% of tiny house owners have no mortgage at all.',
+      ],
+    },
+    {
+      id: 'parking',
+      name: 'Parking Space',
+      sqft: 144,
+      icon: '\u{1F697}',
+      color: 'var(--orange)',
+      colorRgb: '251,146,60',
+      facts: [
+        'A standard US parking space is about 8\u00d718 ft (144 sq ft).',
+        'A tiny house is roughly 1.5 parking spaces wide.',
+        'There are about 800 million parking spaces in the US alone!',
+      ],
+    },
+    {
+      id: 'bus',
+      name: 'School Bus',
+      sqft: 245,
+      icon: '\u{1F68C}',
+      color: 'var(--yellow)',
+      colorRgb: '250,204,21',
+      facts: [
+        'A standard school bus interior is about 245 sq ft.',
+        'A tiny house and a school bus are almost the same footprint!',
+        '"Skoolies" are school buses converted into tiny homes.',
+      ],
+    },
+    {
+      id: 'studio',
+      name: 'Studio Apt',
+      sqft: 500,
+      icon: '\u{1F3E2}',
+      color: 'var(--accent2)',
+      colorRgb: '167,139,250',
+      facts: [
+        'A typical studio apartment in a US city is about 500 sq ft.',
+        'You could fit two tiny houses inside one studio apartment!',
+        'NYC studio rents average over $2,800/mo \u2014 tiny house mortgage: ~$300/mo.',
+      ],
+    },
+    {
+      id: 'court',
+      name: 'Basketball Court',
+      sqft: 4700,
+      icon: '\u{1F3C0}',
+      color: 'var(--green)',
+      colorRgb: '74,222,128',
+      facts: [
+        'An NBA court is 94\u00d750 ft \u2014 about 4,700 sq ft.',
+        'You could park roughly 20 tiny houses on one basketball court!',
+        'The three-point line alone encloses more space than a tiny house.',
+      ],
+    },
+  ];
+
+  const maxSqft = Math.max(...spaces.map(s => s.sqft));
+
+  /* ── Build tabs ── */
+  const tabsEl = document.getElementById('tabs');
+  spaces.forEach((sp, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = sp.icon + ' ' + sp.name;
+    btn.dataset.index = i;
+    btn.addEventListener('click', () => selectSpace(i));
+    tabsEl.appendChild(btn);
+  });
+
+  /* ── Stage layout helpers ── */
+  // We map sqft -> area on screen, keeping aspect ratios recognizable
+  const stageEl = document.getElementById('stage');
+
+  function pct(v) { return v + '%'; }
+
+  // Returns {w, h} in percent of stage, and a nice aspect ratio
+  function dims(sp) {
+    // scale area relative to the court (largest)
+    const areaRatio = sp.sqft / 4700;
+    // stage usable area ~80% x 80%
+    const stageArea = 80 * 80; // percent^2
+    const boxArea = stageArea * areaRatio;
+    // pick aspect ratios per type
+    const aspects = { tiny: 1.6, parking: 2.25, bus: 5, studio: 1.4, court: 1.88 };
+    const ar = aspects[sp.id] || 1.5;
+    let h = Math.sqrt(boxArea / ar);
+    let w = h * ar;
+    // clamp
+    w = Math.min(w, 90);
+    h = Math.min(h, 85);
+    return { w, h };
+  }
+
+  /* ── Draw comparison ── */
+  let currentIndex = 0;
+
+  function selectSpace(idx) {
+    currentIndex = idx;
+    const sp = spaces[idx];
+
+    // update tabs
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+
+    drawStage(sp);
+    drawFact(sp);
+    drawInfoCards(sp);
+    drawBars(idx);
+  }
+
+  function drawStage(selected) {
+    // clear old boxes
+    stageEl.querySelectorAll('.space-box').forEach(el => el.remove());
+
+    const tiny = spaces[0];
+    const tinyDims = dims(tiny);
+    const selDims = dims(selected);
+
+    // If we selected tiny itself, just show it centred
+    if (selected.id === 'tiny') {
+      const box = makeBox(tiny, tinyDims, 50 - tinyDims.w / 2, 50 - tinyDims.h / 2, true);
+      stageEl.appendChild(box);
+      requestAnimationFrame(() => box.classList.add('visible'));
+      return;
+    }
+
+    // Show selected centred, then overlay tiny for reference
+    const selBox = makeBox(
+      selected, selDims,
+      50 - selDims.w / 2,
+      50 - selDims.h / 2,
+      false
+    );
+    stageEl.appendChild(selBox);
+
+    // Tiny house overlay — bottom-left of selected
+    const tinyLeft = 50 - selDims.w / 2 + 2;
+    const tinyTop = 50 + selDims.h / 2 - tinyDims.h - 2;
+    const tBox = makeBox(tiny, tinyDims, tinyLeft, tinyTop, true);
+    stageEl.appendChild(tBox);
+
+    requestAnimationFrame(() => {
+      selBox.classList.add('visible');
+      setTimeout(() => tBox.classList.add('visible'), 300);
+    });
+  }
+
+  function makeBox(sp, d, left, top, isTiny) {
+    const el = document.createElement('div');
+    el.className = 'space-box' + (isTiny ? ' pulse' : '');
+    el.style.width = pct(d.w);
+    el.style.height = pct(d.h);
+    el.style.left = pct(left);
+    el.style.top = pct(top);
+    el.style.background = isTiny
+      ? 'rgba(' + sp.colorRgb + ', 0.35)'
+      : 'rgba(' + sp.colorRgb + ', 0.15)';
+    el.style.border = '2px ' + (isTiny ? 'solid' : 'dashed') + ' rgba(' + sp.colorRgb + ', 0.7)';
+    el.innerHTML = '<span class="label">' + sp.icon + ' ' + sp.name + '<br>' + sp.sqft + ' ft&sup2;</span>';
+    return el;
+  }
+
+  /* ── Fun fact ── */
+  function drawFact(sp) {
+    const el = document.getElementById('funFact');
+    el.style.opacity = 0;
+    setTimeout(() => {
+      const f = sp.facts[Math.floor(Math.random() * sp.facts.length)];
+      el.textContent = '\u{1F4A1} ' + f;
+      el.style.opacity = 1;
+    }, 250);
+  }
+
+  /* ── Info cards ── */
+  function drawInfoCards(sp) {
+    const wrap = document.getElementById('infoCards');
+    const tiny = spaces[0];
+    const ratio = (sp.sqft / tiny.sqft).toFixed(1);
+    const diff = sp.sqft - tiny.sqft;
+
+    wrap.innerHTML = [
+      { icon: sp.icon, val: sp.sqft.toLocaleString() + ' ft\u00B2', desc: sp.name + ' area' },
+      { icon: '\u{1F3E0}', val: tiny.sqft + ' ft\u00B2', desc: 'Tiny House area' },
+      { icon: '\u{1F4D0}', val: ratio + 'x', desc: sp.id === 'tiny' ? 'Same size!' : (diff > 0 ? 'Bigger than tiny' : 'Smaller than tiny') },
+      { icon: sp.sqft > tiny.sqft ? '\u{1F4C8}' : '\u{1F4C9}', val: (diff > 0 ? '+' : '') + diff + ' ft\u00B2', desc: 'Difference' },
+    ].map(c =>
+      '<div class="info-card"><div class="icon">' + c.icon + '</div><div class="val">' + c.val + '</div><div class="desc">' + c.desc + '</div></div>'
+    ).join('');
+  }
+
+  /* ── Bars ── */
+  function drawBars(activeIdx) {
+    const wrap = document.getElementById('bars');
+    wrap.innerHTML = '';
+    spaces.forEach((sp, i) => {
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+
+      const label = document.createElement('div');
+      label.className = 'bar-label';
+      label.textContent = sp.icon + ' ' + sp.name;
+
+      const track = document.createElement('div');
+      track.className = 'bar-track';
+
+      const fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.background = i === activeIdx
+        ? sp.color
+        : 'rgba(' + sp.colorRgb + ', 0.45)';
+      fill.textContent = sp.sqft.toLocaleString() + ' ft\u00B2';
+
+      track.appendChild(fill);
+      row.appendChild(label);
+      row.appendChild(track);
+      wrap.appendChild(row);
+
+      // animate
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          fill.style.width = ((sp.sqft / maxSqft) * 100) + '%';
+        }, i * 100);
+      });
+    });
+  }
+
+  /* ── Init ── */
+  selectSpace(0);
+})();
+</script>
+</body>
+</html>
